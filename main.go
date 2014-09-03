@@ -25,11 +25,14 @@ func compileTemplates() *template.Template {
 		}
 		file, _, err := gar.Open(f)
 		if err != nil {
-			log.Fatalf("Unable to open file, %v", err)
+			log.Fatalf("Unable to open template file, %v", err)
 		}
 		b, err := ioutil.ReadAll(file.Content)
 		if err != nil {
-			log.Fatalf("Unable to read file, %v", err)
+			log.Fatalf("Unable to read template file, %v", err)
+		}
+		if err := file.Content.Close(); err != nil {
+			log.Fatalf("Unable to close template file, %v", err)
 		}
 		t = template.Must(t.New(f).Parse(string(b)))
 	}
@@ -52,6 +55,7 @@ func main() {
 		if err != nil {
 			log.Fatalf("Error opening %s, %v", path, err)
 		}
+		defer file.Content.Close()
 		if !ok {
 			http.NotFound(w, r)
 			return
